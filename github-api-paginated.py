@@ -205,7 +205,7 @@ def save_to_csv(data, filename=None):
     return filename
 
 def main():
-    # URL for enterprise audit log
+    # URL for api call
     url = "https://api.github.com/enterprises/my-enterprise/audit-log?phrase=created%3A%3E%3D2025-03-18T00%3A00%3A00+00%3A00+action%3Agit.clone&include=git"
     
     try:
