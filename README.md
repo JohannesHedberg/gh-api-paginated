@@ -5,7 +5,8 @@ Useful for big queries where pagination is needed.
 ## How to use
 - Create a PAT with the permissions required for your operation.  
 Export it as GITHUB_TOKEN or input it on each run.  
-- Set the url variable in main function.
-Example: ```"https://api.github.com/enterprises/my-enterprise/audit-log?phrase=created%3A%3E%3D2025-03-18T00%3A00%3A00+00%3A00+action%3Agit.clone&include=git"```
-- Run it.
+- Run it: 
+```
+python github-api-paginated.py --from-date 2025-03-25 --enterprise my-enterprise --action git.clone --include git
+```
 

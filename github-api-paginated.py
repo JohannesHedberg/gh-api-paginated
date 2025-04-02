@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import time
 import logging
+import argparse
 
 # Configure logging
 logging.basicConfig(
@@ -239,11 +240,36 @@ def save_to_csv(data, filename=None):
     logger.info(f"Successfully saved {len(data)} items to {filename}")
     return filename
 
-def main():
-    # URL for api call
-    url = "https://api.github.com/enterprises/my-enterprise/audit-log?phrase=created%3A%3E%3D2025-03-18T00%3A00%3A00+00%3A00+action%3Agit.clone&include=git"
+def validate_date(date_str):
+    """
+    Validate the date string format (YYYY-MM-DD)
+    """
+    try:
+        datetime.strptime(date_str, '%Y-%m-%d')
+        return date_str
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Invalid date format: {date_str}. Please use YYYY-MM-DD")
 
-    logger.info("Starting GitHub data retrieval process")
+def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Retrieve GitHub audit logs from a specified date')
+    parser.add_argument('--from-date', type=validate_date, default='2025-03-18',
+                        help='Retrieve logs from this date forward (format: YYYY-MM-DD)')
+    parser.add_argument('--enterprise', type=str,
+                        help='The GitHub enterprise name')
+    parser.add_argument('--action', type=str, default='git.clone',
+                        help='The action to filter for')
+    parser.add_argument('--include', type=str, default='git',
+                        help='Include additional data')
+    args = parser.parse_args()
+
+    # Format the date as required by GitHub API (ISO 8601)
+    from_date = f"{args.from_date}T00:00:00+00:00"
+    
+    # Build the URL with the from-date parameter
+    url = f"https://api.github.com/enterprises/{args.enterprise}/audit-log?phrase=created%3A%3E%3D{from_date}+action%3A{args.action}&include={args.include}"
+
+    logger.info(f"Starting GitHub data retrieval process from date: {args.from_date}")
 
     try:
         # Retrieve data
